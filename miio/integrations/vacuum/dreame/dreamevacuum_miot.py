@@ -16,7 +16,6 @@ from miio.updater import OneShotServer
 
 _LOGGER = logging.getLogger(__name__)
 
-
 DREAME_1C = "dreame.vacuum.mc1808"
 DREAME_F9 = "dreame.vacuum.p2008"
 DREAME_D9 = "dreame.vacuum.p2009"
@@ -70,7 +69,6 @@ _DREAME_1C_MAPPING: MiotMapping = {
     "play_sound": {"siid": 24, "aiid": 3},
     "set_voice": {"siid": 24, "aiid": 2},
 }
-
 
 _DREAME_F9_MAPPING: MiotMapping = {
     # https://home.miot-spec.com/spec/dreame.vacuum.p2008
@@ -197,12 +195,12 @@ def _get_cleaning_mode_enum_class(model):
     if model == DREAME_1C:
         return CleaningModeDreame1C
     elif model in (
-        DREAME_F9,
-        DREAME_D9,
-        DREAME_Z10_PRO,
-        DREAME_MOP_2_PRO_PLUS,
-        DREAME_MOP_2_ULTRA,
-        DREAME_MOP_2,
+            DREAME_F9,
+            DREAME_D9,
+            DREAME_Z10_PRO,
+            DREAME_MOP_2_PRO_PLUS,
+            DREAME_MOP_2_ULTRA,
+            DREAME_MOP_2,
     ):
         return CleaningModeDreameF9
     return None
@@ -447,10 +445,9 @@ class DreameVacuum(MiotDevice, VacuumInterface):
     )
     def status(self) -> DreameVacuumStatus:
         """State of the vacuum."""
-
         return DreameVacuumStatus(
             {
-                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                prop["did"]: prop["value"] if prop["code"] == 0 and "value" in prop else None
                 for prop in self.get_properties_for_mapping(max_properties=10)
             },
             self.model,
@@ -613,8 +610,8 @@ class DreameVacuum(MiotDevice, VacuumInterface):
     def rotate(self, rotatation: int) -> None:
         """Rotate vacuum."""
         if (
-            rotatation < self.MANUAL_ROTATION_MIN
-            or rotatation > self.MANUAL_ROTATION_MAX
+                rotatation < self.MANUAL_ROTATION_MIN
+                or rotatation > self.MANUAL_ROTATION_MAX
         ):
             raise DeviceException(
                 "Given rotation is invalid, should be [%s, %s], was %s"
